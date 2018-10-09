@@ -1,0 +1,390 @@
+1. Uvod
+
+Git predstavlja 3 generaciju sistema za subversion kontrolu. 
+Za razliku od 2 generacije koja se bazira na centralizovanom repozitorijumu kojem pristupaju svi korisnici Git predstavlja distribuirani sistem. 
+U sklopu Git distribuiranog sistema svaki od korisnika moza da poseduje svoj lokalni repositorijum koji moze ali i ne mora da bude povezan sa nekim remote repositorijumom. 
+Git je kreiran 2005 god. od strane Linus Torvaldsa kako bi se obezbedio efikasan version control sistem za odrzavanje Linux OS-a.
+
+Uporeba Git-a ima nekoliko prednosti u odnosti na sisteme druge generacije kao sto su SVN (SVNTortoise i dr.):
+
+1). Upotreba razlicitih topologija
+
+Centralizovana topologija
+Obzirom na to da postojanje lokalnog repositorijuma nije obavezno Git se moze koristiti na nacin koji imitira sisteme 2 generacije i tada korisnici nece kreirati svoje lokalne repositorijume i sve izmene se komituju direktno na remote repositorijum kao kod SVN-a.
+
+Hijerarhiska topologija
+Kod ove topologije postoji jasno definisana mreza povezanih repositorijuma koji imaju hijerarhiski odnos. Odredjeni pod-repositorijumi se koriste za specificne stvari a zatim se njihov sadrzaj uvlaci u repositorijum koji se nalazi iznad njih u lancu komitovanja izmena. Ovakvi sistemi su narocito koristni kod rada na velikim projektima kao sto je odrzavanje Operativnih sistema poput Linux-a.
+
+Distribuirana
+Ovo je topologija kod koje svaki korisnik kreira lokalni repositorijum na koji komituje izmene a sadrzaj tog lokalnog repositorijuma se zatim merguje sa sadrzajem remote repositorijuma. Ovime se jasno stvara hijerarhijski odnos izmedju lokalnih i udaljenih repositorijuma.
+
+2). Bekopovanje, kreiranje bekap kopija je veoma jednostavno.
+
+3). Kreiranje posebnih grana i mergovanje istih je znatno olaksano.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+2. Instalacija
+
+Skinitu instalaciju za Git sa zvanicnog sajta i odabrati tip OS-a: https://git-scm.com/downloads
+
+1). Pokrenuti instalaciju.
+2). Nakon odabira foldera u koji ce Git biti instaliran i u sekciji "Select components" odabrati potrebne komponente i dodatke. U ovoj sekciji se obicno uncekira polje "Aditional Icons" jer nema potrebe za ikonicama na desktopu i sl. Cekirati polje "Use a TrueType font in all console windows."
+3). Odabrati defoltni editor, poput VIM-a ili Notepad+++ i sl.
+4).U sekciji "Adjusting youre PATH enviroment" cekirati zadnju opciju jer je ona dozvoljava upotrebu git komandi kao i nekih LinuxOS komandi iz PowerShell terminala. Jasno je naznaceno upozorenje da ce neke Windows komande poput find biti zamenjene ekvivalentnim komandama sa LinuxOS ali te komande su ionako bolje tako da je to u redu.
+5). Cekirati upotrebu OpenSSH-a
+6). U sekciji "Configuring the line ending conversions" cekirati prvu opciju jer je ona najpogodnija za rad na razlicitim OS-ima.
+7). Ostaviti ostale opcije na defoltnim podesavanjima i zapoceti instalaciju.
+
+Proveriti instalaciju sa komadom "svn --version" u terminalu PowerShell-a, primer isipisa: git version 2.19.1.windows.1
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+3. Konfiguracija
+
+Git ima 3 nivoa konfigarcije:
+
+1). Sistemski 
+	Pristupa se sa komandom: >git config --system
+	Fajl: /etc/gitconfig   ili   C:\ProgramFiles\Git\etc\config
+	
+2). Globalni (User level) - na nivou korisnika.
+	Pristupa se sa komandom: > git config --global
+	Fajl: /.gitcongif   ili   C:\Users\<Username>\.gitconfig
+	
+3). Repositorijum - na nivou pojedinacnog repositorijuma
+	Pristupa se sa komandom: > git config
+	Fajl se nalazi u svakom repositorijumu: .git/congif
+
+
+Konfiguriosanje na korisnickom (globalnom) nivou:
+
+Izlistavanje svih setovanih propertija: >git config --global --list
+Setovanje imena i email-a globalnog korisnika: 
+
+>git config --global user.name "Jovan Jovanovic"
+>git config --global user.email "jovan.jovanovic@primer.com"
+
+Napomena: U prosloj komandi "ser" oznacava pod sekciju konfiguracionog fajla koji sadrzi polje tipa name, email i sl.
+
+>git config --global --list
+user.name=Jovan Jovanovic
+user.email=jovan.jovanovic@primer.com
+
+Otvaranje fajla C:\Users\<Username>\.gitconfig imamo sledeci sadrzaj:
+
+[user]
+	name = Miroslav Milinkov
+	email = miroslav.milinkov@persida-bio.com
+	
+Setovanje defoltnog editora: >git config --global core.editor "C:\Program Files\Notepad++\notepad++.exe"	
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+4. Rad sa lokalnim repositorijumom
+
+Kreiranje lokalnog repositorijuma se postize sa komadom "git init".
+Kreirati folder za potrebe repositorijuma. uci u njega i unet komandu: >git init
+
+Provera stanja repositorijuma: >git status
+
+>git status
+On branch master
+
+No commits yet
+
+Kreiranje fajla u Primer.java repositorijumu i provera sa git ststus:
+
+>git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        Primer.java
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+Objasnjenje: Git je prepoznao da folder repositorijuma sadrzi fajl Primer.java ali taj fajl nije deo samog repositorijuma.
+
+Dodavanje fajla u litu fajlova za komitovanje na respositorijum: >git add ime_fajla
+
+Dodavanje fajlo u listu fajlova koji su spremni za sledeci komit se operacija koja se zove "stageing". 
+Stageing predstavlja korak pripreme za izvrsenje neke logicke operacije nad repozitorijumom, dodavanje fajla, brisanje, izmena itd.
+
+> git add Primer.java
+> git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+
+        new file:   Primer.java
+
+Objasnjenje: Fajl Primer.java je sada deo liste fajlova koja su spremni za komitovanje na repositorijuma.
+
+Komitovanje fajlaova na repositorijum: >git commit 
+
+Napomena: Nakon unosa komade "git commit" otvorice se editor koji je setovan kao defoltni za repositorijum/usera itd. i unece se Log message komita.
+Log message komita je prikazan u ispisu nakon unosa komande.
+
+>git commit
+[master (root-commit) 36a4b43] Commited Primer.java as part of a test for Git!
+ 1 file changed, 23 insertions(+)
+ create mode 100644 Primer.java
+
+>git status
+On branch master
+nothing to commit, working tree clean
+
+Za direktan unos Log poruke komita koristi se opcija -m: >git commit -m "Log message komita...."
+
+Izmena fajlova koji su komitovani na repositorijum i provra sa "git status", izmena fajla Primer.java:
+
+>start notepad++ Primer.java
+>git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   Primer.java
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+Da bi se komitovali fajlovi (izmenjeni ili ne) moraju se ponovo dodati (stageing) sa komandom add:
+
+Napomena: Kao i prosli put svaki komit zahteva upis Log message-a za toj komit.
+
+>git add Primer.java
+> git commit
+[master ed70fbf] Added toString() method to class.
+ 1 file changed, 4 insertions(+)
+
+Pregled istorije komita: >git log
+
+>git log
+commit ed70fbfe378342de01db9a75ce71b4f6a3c0c22f (HEAD -> master)
+Author: Miroslav Milinkov <miroslav.milinkov@persida-bio.com>
+Date:   Mon Oct 8 17:38:16 2018 +0200
+
+    Added toString() method to class.
+
+commit 36a4b435ac57163be0a993030b38f0ed3ba67414
+Author: Miroslav Milinkov <miroslav.milinkov@persida-bio.com>
+Date:   Mon Oct 8 17:28:50 2018 +0200
+
+    Commited Primer.java as part of a test for Git!
+
+Poredjenje izmena u razlicitm komitima: >git diff  comit_1..comit_2
+
+>git diff ed70fbf..36a4b43	
+diff --git a/Primer.java b/Primer.java
+index 5af1b12..4379a8a 100644
+--- a/Primer.java
++++ b/Primer.java
+@@ -20,8 +20,4 @@ class Primer{
+        public void setS(String s){
+                this.s=s;
+        }
+-
+-       public String toString(){
+-               return i+", "+s;
+-       }
+ }
+\ No newline at end of file
+
+Identifikacija komita se moze hrsiti preko property-a HEAD. HEAD oznacava zadnji komit, HEAD~1 je predposlednji komit.
+
+>git diff HEAD..HEAD~1
+
+Primer: Kreiranje dva nova fajla i komitoavnje u sklopu dva odvojena komita.
+
+>echo "ovo je sadrzaj fajla file_1.txt." > file_1.txt
+>echo "ovo je sadrzaj fajla file_2.txt." > file_2.txt
+>git add file_1.txt
+>git commit -m "Added file file_1.txt"
+>git add file_2.txt
+>git commit -m "Added file file_2.txt"
+
+
+Uklanjanja iz repositorijuma fajlova koji su obrisani sa file sistema.
+
+//uklanjanje fajla
+rm file_1.txt
+
+//provera repositorijuma
+> git status
+On branch master
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        deleted:    file_1.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+//dodavanje obrisanog fajla file_1.txt na staging za brisanje sa repositorijuma
+> git add file_1.txt
+
+//provera repositorijuma
+> git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        deleted:    file_1.txt
+
+//komit
+> git commit -m  "Removed file_1.txt"
+[master be47f6f] Removed file_1.txt
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ delete mode 100644 file_1.txt
+
+ 
+Preuzimanje HEAD verzije sadrzaja fajla iz repozitorijuma: git checkout ime_fajla
+ 
+>git checkout file_1.txt 
+ 
+ 
+Ciscenje repositorijuma: >git clean [opcije] ime_fajla
+
+Opcije:
+-n - ispis fajlova koji ce biti obrisani iz repository foldera.
+-f - brisanje svih fajova izlistanih preko -n
+
+>echo "adad" > test.txt
+> echo "adawdadad" > testTTTT.txt
+> git clean -n
+Would remove test.txt
+Would remove testTTTT.txt
+> git clean -f
+Removing test.txt
+Removing testTTTT.txt
+ 
+ 
+Ignorisanje fajlova, .gitignore
+
+>mkdir logs
+> cd .\logs\
+s> echo "" > logFile.log
+> echo "" > logFile.log.1
+> echo "" > logFile.log.2
+> cd ..
+> git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        logs/
+
+nothing added to commit but untracked files present (use "git add" to track)
+> start notepad++ .gitignore
+> more .\.gitignore
+/logs
+
+> git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        .gitignore
+
+nothing added to commit but untracked files present (use "git add" to track)
+> git add .gitignore
+> git commit -m "Added .gitignore file, ignore /logs folder."
+[master 9ee5fbd] Added .gitignore file, ignore /logs folder.
+ 1 file changed, 1 insertion(+)
+ create mode 100644 .gitignore
+> git status
+On branch master
+nothing to commit, working tree clean
+
+
+ 
+Primer. Dodavanje, brisanje i izmena fajlova u sklopu jednok komita.
+
+
+> echo "Ovo je sadrzaj fajla 3" > file_3.txt
+> rm file_2.txt
+> git status
+On branch master
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        deleted:    file_2.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        file_3.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+> git add file_3.txt
+> git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        new file:   file_3.txt
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        deleted:    file_2.txt
+
+> git add file_2.txt
+> git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        deleted:    file_2.txt
+        new file:   file_3.txt
+
+> start notepad++ file_1.txt
+> git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        deleted:    file_2.txt
+        new file:   file_3.txt
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   file_1.txt
+
+> git add file_1.txt
+P> git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        modified:   file_1.txt
+        deleted:    file_2.txt
+        new file:   file_3.txt
+
+> git commit -m 'New commit!'
+[master 76e1124] New commit!
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+ delete mode 100644 file_2.txt
+ create mode 100644 file_3.txt
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+5. Rad sa udaljenim repositorijumom
+
+
+Skidanje sadrzaja udaljenog repositorijuma: >git close url_repositorijuma
+
+
+
